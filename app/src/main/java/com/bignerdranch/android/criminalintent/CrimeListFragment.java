@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by Yongkyu on 2017-10-28.
@@ -23,6 +24,8 @@ public class CrimeListFragment extends Fragment {
     private static final int REQUEST_CRIME = 1;
     private RecyclerView mCrimeRecyclerView;
     private CrimeAdapter mAdapter;
+
+        private int mItemChangedPosition = RecyclerView.NO_POSITION;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -48,7 +51,16 @@ public class CrimeListFragment extends Fragment {
             mAdapter = new CrimeAdapter(crimes);
             mCrimeRecyclerView.setAdapter(mAdapter);
         } else {
-            mAdapter.notifyDataSetChanged();
+            mAdapter.notifyItemChanged(mItemChangedPosition);
+            mItemChangedPosition = RecyclerView.NO_POSITION;
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        //super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == REQUEST_CRIME) {
+            getActivity().setResult(Activity.RESULT_OK, null);
         }
     }
 
@@ -76,16 +88,9 @@ public class CrimeListFragment extends Fragment {
         @Override
         public void onClick(View view) {
             //Toast.makeText(getActivity(),mCrime.getTitle() + " 선택됨!", Toast.LENGTH_SHORT).show();
-            Intent intent = CrimeActivity.newIntent(getActivity(), mCrime.getId());
+            mItemChangedPosition = getAdapterPosition();
+            Intent intent = CrimePagerActivity.newIntent(getActivity(), mCrime.getId());
             startActivityForResult(intent,REQUEST_CRIME);
-        }
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        //super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == REQUEST_CRIME) {
-            getActivity().setResult(Activity.RESULT_OK, null);
         }
     }
 
